@@ -5,7 +5,7 @@ from fastapi.responses import Response
 from uvicorn import run as app_run
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-
+import os
 
 from src.pipeline.prediction_pipeline import PredictionPipeline
 from src.pipeline.train_pipeline import TrainPipeline
@@ -97,6 +97,11 @@ async def trainRouteClient():
         return Response(f"Error Occurred! {e}")
 
 
+@app.get("/test_env")
+async def testEnv():
+    mongo_url = os.getenv("MONGODB_URL")
+    return {"MONGODB_url": mongo_url}
+
 @app.get("/")
 async def predictGetRouteClient(request: Request):
     try:
@@ -155,5 +160,10 @@ async def predictRouteClient(request: Request):
 
 
 if __name__ == "__main__":
-    app_run(app, host = APP_HOST, port =APP_PORT)
+    import uvicorn
+
+    print("MONGODB URL:", os.getenv("MONGODB_URL"))
+    print("MONGODB_URL_KEY:", os.getenv("MONGODB_URL_KEY"))
     
+    uvicorn.run("app:app", host="127.0.0.1", port=8000, reload=True)
+
